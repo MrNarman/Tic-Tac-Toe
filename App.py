@@ -21,4 +21,6 @@ def enter_move(board):
 
     display_board(board)
 
-enter_move(board)
+def make_list_of_free_fields(board):
+    # The function browses the board and builds a list of all the free squares;
+    return [(index // 3, index % 3) for index, value in enumerate (board) if value == '']
