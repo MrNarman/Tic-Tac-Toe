@@ -1,31 +1,34 @@
-from random import randint
-
-board = [' ' for _ in range(9)]
+from random import choice
 
 def display_board(board):
     # The function accepts one parameter containing the board's current status
     # and prints it out to the console.
-
-    print(f"{board[0]}|{board[1]}|{board[2]}")
-    print("-" * 5)
-    print(f"{board[3]}|{board[4]}|{board[5]}")
-    print("-" * 5)
-    print(f"{board[6]}|{board[7]}|{board[8]}")
-
+    for i in range(0, 9 ,3):
+        print(f" {board[i] or ' '} | {board[i+1] or ' '} | {board[i+2] or ' '}")
+        if i < 6:
+            print("---|---|---")
+    print("\n")
+    
 def enter_move(board):
     # The function accepts the board's current status, asks the user about their move, 
     # checks the input, and updates the board according to the user's decision.
-
-    user_input = int(input("Enter your move. Cell 1-9: "))
-    user_input -= 1
-
-    board[user_input] = "X"
-
-    display_board(board)
+    while True:
+        user_input = input("Enter your move, Cell 1-9: ")
+        if user_input.isdigit():
+            user_input = int(user_input)
+            if 1 <= user_input <= 9:
+                user_input -= 1
+                if board[user_input] == '':
+                    board[user_input] = 'O'
+                    break
+                else:
+                    print("Cell is already occupied. Try again")
+        else:
+            print("Invalid input. Try again using a number between 1 and 9")
 
 def make_list_of_free_fields(board):
     # The function browses the board and builds a list of all the free squares;
-    return [(index // 3, index % 3) for index, value in enumerate (board) if value == '']
+    return [index for index, value in enumerate(board) if value == '']
 
 def victory_for(board, sign):
     # The function analyzes the board's status in order to check if 
@@ -51,10 +54,40 @@ def draw_move(board):
     # The function draws the computer's move and updates the board.
     
     free_fields = make_list_of_free_fields(board)
-    count = len(free_fields)
-    if count > 0:
-        move = randint(count)
-        row, col = free_fields[move]
-        board[row][col] = 'O'
+    if free_fields:
+        move = choice(free_fields)
+        board[move] = 'X' #Computer starts with 'X in the middle
 
 # Implement the logic  for the program
+def start_game():
+    board = [''] * 9
+    board[4] = 'X'
+    
+    while True:
+        display_board(board)
+        
+        # Your round
+        enter_move(board)
+        if victory_for(board, 'O'):
+            display_board(board)
+            print("Player wins")
+            break
+        
+        if not make_list_of_free_fields(board):
+            display_board(board)
+            print("We have a draw")
+            break
+            
+        # Computer's round
+        draw_move(board)
+        display_board(board)
+        if victory_for(board, 'X'):
+            print("Loser! You ain't better than a machine.")
+            break
+        
+        if not make_list_of_free_fields(board):
+            display_board(board)
+            print("We have a draw.")
+            break
+
+start_game()
